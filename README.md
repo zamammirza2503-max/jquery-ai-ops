@@ -3,7 +3,7 @@
 A real-time AI infrastructure monitoring dashboard built with **jQuery, JavaScript, Node.js, Express, WebSockets and Chart.js**.
 
 ### Dashboard
-![AI Operations Dashboard](docs/screenshots/dashboard.PNG)
+![AI Operations Dashboard](./screenshots/dashboard.png)
 
 ## Features
 
