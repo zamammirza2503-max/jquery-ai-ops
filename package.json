@@ -1,0 +1,15 @@
+{
+  "name": "jquery-ai-operations-control-center",
+  "version": "1.0.0",
+  "description": "A real-time AI operations monitoring dashboard built with jQuery, Node.js, Express, WebSockets and Chart.js.",
+  "private": true,
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "ws": "^8.18.3"
+  }
+}

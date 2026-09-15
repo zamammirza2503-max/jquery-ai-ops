@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI Operations Control Center — real-time AI infrastructure monitoring dashboard">
+  <title>AI Ops Control Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/css/base.css">
+  <link rel="stylesheet" href="/src/css/dashboard.css">
+  <link rel="stylesheet" href="/src/css/components.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">AI</div>
+        <div>
+          <strong>AI Ops</strong>
+          <span>Control Center</span>
+        </div>
+      </div>
+
+      <nav class="main-nav" aria-label="Primary navigation">
+        <button class="nav-item active" data-page="dashboard"><span>▦</span> Dashboard</button>
+        <button class="nav-item" data-page="models"><span>◈</span> Models</button>
+        <button class="nav-item" data-page="monitoring"><span>◉</span> Monitoring</button>
+        <button class="nav-item" data-page="alerts"><span>!</span> Alerts <b id="nav-alert-count">0</b></button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="connection-card">
+          <span class="status-dot" id="sidebar-status-dot"></span>
+          <div>
+            <strong id="sidebar-connection">Connecting</strong>
+            <small>Telemetry stream</small>
+          </div>
+        </div>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">☾ <span>Theme</span></button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-toggle" id="menu-toggle" aria-label="Open navigation">☰</button>
+          <div>
+            <p class="eyebrow">Operations / AI Infrastructure</p>
+            <h1 id="page-title">System Overview</h1>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button class="command-button" id="command-open" type="button"><span>⌘</span> Search <kbd>Ctrl K</kbd></button>
+          <div class="system-status"><span class="status-dot" id="header-status-dot"></span><span id="header-status">Operational</span></div>
+        </div>
+      </header>
+
+      <div class="page-container">
+        <!-- Dashboard -->
+        <section class="page active" id="page-dashboard" data-page-content="dashboard">
+          <div class="page-heading">
+            <div>
+              <h2>System Overview</h2>
+              <p>Real-time health and performance across the AI platform.</p>
+            </div>
+            <button class="button secondary" id="refresh-dashboard">↻ Refresh</button>
+          </div>
+
+          <div class="metric-grid" id="metric-grid">
+            <article class="metric-card skeleton-card"><div class="skeleton"></div></article>
+            <article class="metric-card skeleton-card"><div class="skeleton"></div></article>
+            <article class="metric-card skeleton-card"><div class="skeleton"></div></article>
+            <article class="metric-card skeleton-card"><div class="skeleton"></div></article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel chart-panel wide">
+              <div class="panel-header">
+                <div>
+                  <h3>Request volume</h3>
+                  <span>Requests per minute · live telemetry</span>
+                </div>
+                <select id="request-range" class="select-control">
+                  <option value="12">Last 12 points</option>
+                  <option value="24">Last 24 points</option>
+                </select>
+              </div>
+              <div class="chart-wrap"><canvas id="request-chart"></canvas></div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div><h3>System health</h3><span>Current resource utilization</span></div>
+              </div>
+              <div class="health-list" id="health-list"></div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div><h3>Model performance</h3><span>Production inference metrics</span></div>
+                <button class="text-button" data-page-link="models">View all</button>
+              </div>
+              <div class="model-performance" id="model-performance"></div>
+            </article>
+
+            <article class="panel wide">
+              <div class="panel-header">
+                <div><h3>Live activity</h3><span>Latest platform events</span></div>
+                <span class="live-label"><i></i> LIVE</span>
+              </div>
+              <div class="activity-feed compact" id="dashboard-activity"></div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Models -->
+        <section class="page" id="page-models" data-page-content="models">
+          <div class="page-heading">
+            <div><h2>AI Models</h2><p>Model inventory, deployment state and inference performance.</p></div>
+            <button class="button primary" id="add-model">+ Register model</button>
+          </div>
+
+          <div class="toolbar panel">
+            <div class="search-field"><span>⌕</span><input id="model-search" type="search" placeholder="Search models..."></div>
+            <div class="filter-group" id="model-filters">
+              <button class="filter active" data-status="all">All</button>
+              <button class="filter" data-status="online">Online</button>
+              <button class="filter" data-status="warning">Warning</button>
+              <button class="filter" data-status="offline">Offline</button>
+            </div>
+          </div>
+
+          <article class="panel">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>Model</th><th>Version</th><th>Status</th><th>Requests</th><th>Latency</th><th>Error rate</th><th></th></tr></thead>
+                <tbody id="models-table-body"></tbody>
+              </table>
+            </div>
+            <div class="pagination" id="models-pagination"></div>
+          </article>
+        </section>
+
+        <!-- Monitoring -->
+        <section class="page" id="page-monitoring" data-page-content="monitoring">
+          <div class="page-heading">
+            <div><h2>Live Monitoring</h2><p>Streaming infrastructure telemetry and event activity.</p></div>
+            <span class="live-label large"><i></i> WebSocket stream</span>
+          </div>
+
+          <div class="monitor-grid">
+            <article class="panel">
+              <div class="panel-header"><div><h3>Telemetry stream</h3><span>Newest events appear automatically.</span></div><button class="text-button" id="clear-activity">Clear</button></div>
+              <div class="activity-feed" id="monitoring-activity"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-header"><div><h3>Infrastructure</h3><span>Current resources</span></div></div>
+              <div class="infra-stats" id="monitor-infra"></div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Alerts -->
+        <section class="page" id="page-alerts" data-page-content="alerts">
+          <div class="page-heading">
+            <div><h2>Alerts</h2><p>Operational incidents and model health warnings.</p></div>
+            <button class="button secondary" id="resolve-all">Resolve all</button>
+          </div>
+          <article class="panel">
+            <div class="alerts-list" id="alerts-list"></div>
+          </article>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <div class="modal-backdrop" id="model-modal-backdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="modal-close" id="modal-close" aria-label="Close">×</button>
+      <div id="model-modal-content"></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="command-backdrop">
+    <div class="command-modal">
+      <div class="command-search"><span>⌕</span><input id="command-input" autocomplete="off" placeholder="Search models, pages and actions..."></div>
+      <div id="command-results"></div>
+      <div class="command-footer"><span>↑↓ Navigate</span><span>Enter Select</span><span>Esc Close</span></div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+  <script src="/src/js/state.js"></script>
+  <script src="/src/js/utils.js"></script>
+  <script src="/src/js/api.js"></script>
+  <script src="/src/js/charts.js"></script>
+  <script src="/src/js/dashboard.js"></script>
+  <script src="/src/js/models.js"></script>
+  <script src="/src/js/alerts.js"></script>
+  <script src="/src/js/websocket.js"></script>
+  <script src="/src/js/app.js"></script>
+</body>
+</html>
